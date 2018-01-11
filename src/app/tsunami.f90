@@ -31,25 +31,25 @@ do i = 1, im
 end do
 
 ! write initial state to screen
-write(unit=output_unit, fmt=*)0, u
+write(unit=output_unit, fmt=*) 0, u
 
 time_loop: do n = 1, nm
-
-  ! calculate the upstream difference of h in x
-  do i = 2, im
-    du(i) = u(i) - u(i-1)
-  end do
 
   ! apply periodic boundary condition on the left 
   du(1) = u(1) - u(im)
 
+  ! calculate the upstream difference of u in x
+  do concurrent (i = 2:im)
+    du(i) = u(i) - u(i-1)
+  end do
+
   ! compute u at next time step
-  do i = 1, im
+  do concurrent (i = 1:im)
     u(i) = u(i) - c * du(i) / dx * dt
   end do
 
   ! write current state to screen
-  write(unit=output_unit, fmt=*)n, u
+  write(unit=output_unit, fmt=*) n, u
 
 end do time_loop
 
